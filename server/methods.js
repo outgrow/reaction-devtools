@@ -8,8 +8,8 @@ import bufferStreamReader from "buffer-stream-reader";
 import { FileRecord } from "@reactioncommerce/file-collections";
 import { Meteor } from "meteor/meteor";
 import { Random } from "meteor/random";
-import { Job } from "/imports/plugins/core/job-collection/lib";
-import { Products, ProductSearch, Tags, Packages, Jobs, Orders, OrderSearch, Catalog, MediaRecords } from "/lib/collections";
+import { Products, ProductSearch, Tags, Packages, Orders, OrderSearch, Catalog, MediaRecords } from "/lib/collections";
+import { Job, Jobs } from "/imports/utils/jobs"
 import { Media } from "/imports/plugins/core/files/server";
 import Logger from "@reactioncommerce/logger";
 import { productTemplate, variantTemplate, optionTemplate, orderTemplate } from "./dataset";
