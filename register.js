@@ -1,23 +1,11 @@
-import { Reaction } from "/lib/api";
+/**
+ * This file is necessary for backwards compatibility while we refactor
+ * the API to remove Meteor. The no-meteor `register.js` file will
+ * eventually become the main entry point of the plugin, but for now
+ * our Meteor tooling loads this file, so we include this here as a
+ * temporary bridge.
+ */
+import Reaction from "/imports/plugins/core/core/server/Reaction";
+import register from "./server/no-meteor/register";
 
-// Register package as ReactionCommerce package
-Reaction.registerPackage({
-  label: "Reaction Devtools",
-  name: "reaction-devtools",
-  icon: "fa fa-code",
-  version: "1.0.0",
-  meta: {
-    version: "1.0.0"
-  },
-  autoEnable: !!(process.env.NODE_ENV === "development"),
-  registry: [
-    {
-      name: "reaction-devtools-admin",
-      label: "Dev Tools",
-      provides: ["settings"],
-      container: "dashboard",
-      template: "DevTools",
-      icon: "fa fa-code"
-    }
-  ]
-});
+Reaction.whenAppInstanceReady(register);

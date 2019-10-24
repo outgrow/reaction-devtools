@@ -1,4 +1,4 @@
-[{
+export default [{
   "name": "Default shipping provider",
   "methods": [{
     "name": "Free",
@@ -38,4 +38,4 @@
     "name": "flatRates",
     "label": "Flat Rate"
   }
-}]
+}];

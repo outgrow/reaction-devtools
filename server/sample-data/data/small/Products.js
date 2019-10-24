@@ -1,4 +1,4 @@
-[{
+export default [{
 	"_id": "h2v7MYCXBtjMm7Piv",
 	"type": "simple",
   "supportedFulfillmentTypes": ["shipping"],
@@ -1037,5 +1037,4 @@
 		"status": "new"
 	},
 	"originCountry": "US"
-}]
-
+}];

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Meteor } from "meteor/meteor";
 import { Button, SettingsCard } from "@reactioncommerce/reaction-ui";
-
+import loadProductsAndTags from "../mutations/loadProductsAndTags";
 
 class DevTools extends Component {
   handleResetDataClick = () => {
@@ -44,14 +44,21 @@ class DevTools extends Component {
     });
   }
 
-  handleSeedDataClick = () => {
-    Meteor.call("devtools/loaddata/small/products", (error) => {
-      if (error) {
-        Alerts.toast(`Error loading sample data ${error.reason}`, "error");
-      } else {
-        Alerts.toast("Sample data loaded", "success");
-      }
-    });
+  handleSeedDataClick = async () => {
+    const { client } = this.props;
+
+    try {
+      await client.mutate({
+        mutation: loadProductsAndTags,
+        variables: {
+          input: {
+            size: "small"
+          }
+        }
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   handleSmallOrdersClick = () => {

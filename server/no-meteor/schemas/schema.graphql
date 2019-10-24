@@ -1,0 +1,63 @@
+enum DatasetSize {
+  "Small dataset"
+  small
+
+  "Medium dataset"
+  medium
+
+  "Large dataset"
+  large
+}
+
+extend type Mutation {
+  "Load generated products and tags"
+  loadProductsAndTags(
+    "Mutation input"
+    input: LoadDataInput
+  ): LoadDataPayload!
+
+  "Load generated orders"
+  loadOrders(
+    "Mutation input"
+    input: LoadDataInput
+  ): LoadDataPayload!
+
+  "Load product images"
+  loadProductImages(
+    "Mutation input"
+    input: LoadProductImagesInput
+  ): LoadDataPayload!
+
+  "Load product images"
+  resetDevtoolData(
+    "Mutation input"
+    input: ResetDataInput
+  ): LoadDataPayload!
+}
+
+"Input for the `loadData` mutation"
+input LoadDataInput {
+  "An optional string identifying the mutation call, which will be returned in the response payload"
+  clientMutationId: String
+
+  "The size of the dataset to load"
+  size: DatasetSize
+}
+
+input LoadProductImagesInput {
+  "An optional string identifying the mutation call, which will be returned in the response payload"
+  clientMutationId: String
+}
+
+input ResetDataInput {
+  "An optional string identifying the mutation call, which will be returned in the response payload"
+  clientMutationId: String
+}
+
+"Response for the `generateSitemaps` mutation"
+type LoadDataPayload {
+  "The same string you sent with the mutation params, for matching mutation calls with their responses"
+  clientMutationId: String
+
+  wasDataLoaded: Boolean
+}

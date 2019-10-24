@@ -1,4 +1,4 @@
-[{
+export default [{
 	"_id": "J8Bhq3uTtdgwZx3rz",
 	"shopType": "primary",
 	"active": true,
@@ -3494,5 +3494,4 @@
 			"position": 1
 		}
 	]
-}]
-
+}];

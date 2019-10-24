@@ -19,7 +19,7 @@ import getGraphQLContextInMeteorMethod from "/imports/plugins/core/graphql/serve
 
 const methods = {};
 
-function getContext() {
+  function getContext() {
   const context = {
     ...Promise.await(getGraphQLContextInMeteorMethod(Meteor.userId())),
     collections

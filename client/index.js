@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLaptop } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
+import { withApollo } from "react-apollo";
 import { registerOperatorRoute } from "../../../../client/ui";
 import DevTools from "./components/devtools";
 
@@ -9,6 +10,9 @@ registerOperatorRoute({
   isSetting: true,
   path: "/dev-tools",
   mainComponent: DevTools,
+  hocs: [
+    withApollo
+  ],
   // eslint-disable-next-line react/display-name, react/no-multi-comp
   SidebarIconComponent: (props) => <FontAwesomeIcon icon={faLaptop} {...props} />,
   sidebarI18nLabel: "admin.settings.devToolsLabel"
