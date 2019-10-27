@@ -1,1 +1,1 @@
-import "./i18n";
+import "./no-meteor/i18n";

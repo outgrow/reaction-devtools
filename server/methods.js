@@ -14,7 +14,7 @@ import { Media } from "/imports/plugins/core/files/server";
 import Logger from "@reactioncommerce/logger";
 import { productTemplate, variantTemplate, optionTemplate, orderTemplate } from "./dataset";
 import collections from "/imports/collections/rawCollections";
-import publishProductToCatalogById from "/imports/plugins/core/catalog/server/no-meteor/utils/publishProductToCatalogById";
+import publishProductToCatalogById from "/imports/node-app/core-services/catalog/utils/publishProductToCatalogById.js";
 import getGraphQLContextInMeteorMethod from "/imports/plugins/core/graphql/server/getGraphQLContextInMeteorMethod";
 
 const methods = {};

@@ -1,5 +1,5 @@
 import ReactionError from "@reactioncommerce/reaction-error";
-import publishProductToCatalogById from "/imports/plugins/core/catalog/server/no-meteor/utils/publishProductToCatalogById";
+import publishProductToCatalogById from "/imports/node-app/core-services/catalog/utils/publishProductToCatalogById.js";
 import sampleData from "../../sample-data";
 
 /**
