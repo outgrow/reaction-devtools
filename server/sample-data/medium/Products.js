@@ -1,4 +1,4 @@
-[{
+export default [{
 	"_id": "aKJFQeJtNmGPmM364",
 	"type": "simple",
   "supportedFulfillmentTypes": ["shipping"],
@@ -139656,5 +139656,4 @@
 		"status": "new"
 	},
 	"optionTitle": "Handmade Cotton Salad"
-}]
-
+}];

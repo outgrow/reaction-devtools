@@ -1,7 +1,6 @@
 import ReactionError from "@reactioncommerce/reaction-error";
 import publishProductToCatalogById from "/imports/plugins/core/catalog/server/no-meteor/utils/publishProductToCatalogById";
-import smallTags from "../../sample-data/data/small/Tags.js";
-import smallProducts from "../../sample-data/data/small/Products.js";
+import sampleData from "../../sample-data";
 
 /**
  * @name devtools/loadProductsAndTags
@@ -30,12 +29,16 @@ export default async function loadProductsAndTags(context, input) {
     }
   } = context;
 
-  for (let tag of smallTags) {
+  const tags = sampleData[size].tags;
+
+  for (let tag of tags) {
     tag.updatedAt = new Date();
     await Tags.insertOne(tag);
   }
 
-  for (let product of smallProducts) {
+  const products = sampleData[size].products;
+
+  for (let product of products) {
     product.createdAt = new Date();
     product.updatedAt = new Date();
     await Products.insertOne(product);

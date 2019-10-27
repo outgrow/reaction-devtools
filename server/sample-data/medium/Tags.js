@@ -1,4 +1,4 @@
-[{
+export default [{
 	"_id": "cseCBSSrJ3t8HQSNP",
 	"name": "example-product",
 	"slug": "example-product",
@@ -2453,5 +2453,4 @@
 	"isVisible": true,
 	"groups": [],
 	"shopId": "J8Bhq3uTtdgwZx3rz"
-}]
-
+}];
