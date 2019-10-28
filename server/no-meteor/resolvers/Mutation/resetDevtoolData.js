@@ -1,20 +1,19 @@
 /**
  *
- * @method loadProductsAndTags
- * @summary Inserts dummy products and tags into the database.
+ * @method resetDevtoolData
+ * @summary Flushes all products, tags and orders from the database.
  * @param {Object} _ - unused
  * @param {Object} args - The input arguments
  * @param {Object} args.input - mutation input object
  * @param {String} args.input.clientMutationId - The mutation id
- * @param {String[]} args.input.size - the size of the dataset to load
  * @param {Object} context - an object containing the per-request state
  * @return {Promise<Object>} Returns an object with the clientMutationId
  * of the bulk operation
  */
-export default async function loadProductsAndTags(_, { input }, context) {
+export default async function resetDevtoolData(_, { input }, context) {
   const { clientMutationId } = input;
 
-  const mutationResult = await context.mutations.loadProductsAndTags(context, input);
+  const mutationResult = await context.mutations.resetDevtoolData(context, input);
 
   return {
     clientMutationId,

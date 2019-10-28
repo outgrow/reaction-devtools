@@ -13,7 +13,7 @@ import sampleData from "../../sample-data";
  * @returns {Boolean} true if data was inserted
  */
 export default async function loadProductsAndTags(context, input) {
-  const { userHasPermission, userId } = context;
+  const { userHasPermission } = context;
   const { size } = input;
 
   const shopId = await context.queries.primaryShopId(context.collections);

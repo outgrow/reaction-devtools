@@ -2,16 +2,22 @@ import React, { Component } from "react";
 import { Meteor } from "meteor/meteor";
 import { Button, SettingsCard } from "@reactioncommerce/reaction-ui";
 import loadProductsAndTags from "../mutations/loadProductsAndTags";
+import resetDevtoolData from "../mutations/resetDevtoolData";
 
 class DevTools extends Component {
-  handleResetDataClick = () => {
-    Meteor.call("devtools/resetData", (error) => {
-      if (error) {
-        Alerts.toast(`Error resetting sample data ${error.reason}`, "error");
-      } else {
-        Alerts.toast("Reset successful", "success");
-      }
-    });
+  handleResetDataClick = async () => {
+    const { client } = this.props;
+
+    try {
+      await client.mutate({
+        mutation: resetDevtoolData,
+        variables: {
+          input: {}
+        }
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   handleSwagShopImagesClick = () => {
