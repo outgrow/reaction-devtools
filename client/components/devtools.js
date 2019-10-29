@@ -6,7 +6,7 @@ import loadProductsAndTags from "../mutations/loadProductsAndTags";
 import resetDevtoolData from "../mutations/resetDevtoolData";
 
 class DevTools extends Component {
-  handleResetDataClick = async () => {
+  handleResetData = async () => {
     const { client } = this.props;
 
     try {
@@ -16,8 +16,10 @@ class DevTools extends Component {
           input: {}
         }
       });
+
+      Alerts.toast("Database flushed successfully", "success");
     } catch (err) {
-      console.error(err);
+      Alerts.toast(`Error flushing the database ${err}`, "error");
     }
   }
 
@@ -51,7 +53,7 @@ class DevTools extends Component {
     });
   }
 
-  handleSeedDataClick = async () => {
+  handleLoadProductsAndTags = async (size) => {
     const { client } = this.props;
 
     try {
@@ -59,16 +61,18 @@ class DevTools extends Component {
         mutation: loadProductsAndTags,
         variables: {
           input: {
-            size: "small"
+            size
           }
         }
       });
+
+      Alerts.toast("Products and tags loaded successfully", "success");
     } catch (err) {
-      console.error(err);
+      Alerts.toast(`Error loading large sample data ${err}`, "error");
     }
   }
 
-  handleOrderClick = async (desiredOrderCount) => {
+  handleLoadOrders = async (desiredOrderCount) => {
     const { client } = this.props;
 
     try {
@@ -87,46 +91,6 @@ class DevTools extends Component {
     }
   }
 
-  handleMediumDataClick = () => {
-    Meteor.call("devtools/loaddata/medium/products", (error) => {
-      if (error) {
-        Alerts.toast(`Error loading medium sample data ${error.reason}`, "error");
-      } else {
-        Alerts.toast("Load medium dataset successful", "success");
-      }
-    });
-  }
-
-  handleMediumOrdersClick = () => {
-    Meteor.call("devtools/loaddata/medium/orders", (error) => {
-      if (error) {
-        Alerts.toast(`Error loading medium sample data ${error.reason}`, "error");
-      } else {
-        Alerts.toast("Loaded 10000 orders successful", "success");
-      }
-    });
-  }
-
-  handleLargeDataClick = () => {
-    Meteor.call("devtools/loaddata/large/products", (error) => {
-      if (error) {
-        Alerts.toast(`Error loading large sample data ${error.reason}`, "error");
-      } else {
-        Alerts.toast("Load large dataset successful", "success");
-      }
-    });
-  }
-
-  handleLargeOrdersClick = () => {
-    Meteor.call("devtools/loaddata/large/orders", (error) => {
-      if (error) {
-        Alerts.toast(`Error loading large order data ${error.reason}`, "error");
-      } else {
-        Alerts.toast("Loading orders successful", "success");
-      }
-    });
-  }
-
   render() {
     return (
       <div>
@@ -139,7 +103,7 @@ class DevTools extends Component {
             bezelStyle={"solid"}
             primary={true}
             label={"Reset Data"}
-            onClick={this.handleResetDataClick}
+            onClick={this.handleResetData}
           />
         </SettingsCard>
 
@@ -152,7 +116,7 @@ class DevTools extends Component {
             bezelStyle={"solid"}
             primary={true}
             label={"Load Products and Tags"}
-            onClick={this.handleSeedDataClick}
+            onClick={() => this.handleLoadProductsAndTags("small")}
           />
           <br />
           <br />
@@ -160,7 +124,7 @@ class DevTools extends Component {
             bezelStyle={"solid"}
             primary={true}
             label={"Load Orders"}
-            onClick={() => this.handleOrderClick(100)}
+            onClick={() => this.handleLoadOrders(100)}
           />
           <br />
           <br />
@@ -191,7 +155,7 @@ class DevTools extends Component {
             bezelStyle={"solid"}
             primary={true}
             label={"Load Products and Tags"}
-            onClick={this.handleMediumDataClick}
+            onClick={() => this.handleLoadProductsAndTags("medium")}
           />
           <br />
           <br />
@@ -199,7 +163,7 @@ class DevTools extends Component {
             bezelStyle={"solid"}
             primary={true}
             label={"Load Orders"}
-            onClick={() => this.handleOrderClick(10000)}
+            onClick={() => this.handleLoadOrders(10000)}
           />
           <br />
           <br />
@@ -221,7 +185,7 @@ class DevTools extends Component {
             bezelStyle={"solid"}
             primary={true}
             label={"Load Products and Tags"}
-            onClick={this.handleLargeDataClick}
+            onClick={() => this.handleLoadProductsAndTags("large")}
           />
           <br />
           <br />
@@ -229,7 +193,7 @@ class DevTools extends Component {
             bezelStyle={"solid"}
             primary={true}
             label={"Load Orders"}
-            onClick={() => this.handleOrderClick(50000)}
+            onClick={() => this.handleLoadOrders(50000)}
           />
           <br />
           <br />
