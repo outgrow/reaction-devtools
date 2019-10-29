@@ -19,7 +19,7 @@ extend type Mutation {
   "Load generated orders"
   loadOrders(
     "Mutation input"
-    input: LoadDataInput
+    input: LoadOrdersInput
   ): LoadDataPayload!
 
   "Load product images"
@@ -41,7 +41,15 @@ input LoadDataInput {
   clientMutationId: String
 
   "The size of the dataset to load"
-  size: DatasetSize
+  size: DatasetSize!
+}
+
+input LoadOrdersInput {
+  "An optional string identifying the mutation call, which will be returned in the response payload"
+  clientMutationId: String
+
+  "The desired count of orders to generate"
+  desiredOrderCount: Int!
 }
 
 input LoadProductImagesInput {

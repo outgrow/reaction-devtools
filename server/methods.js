@@ -8,11 +8,11 @@ import bufferStreamReader from "buffer-stream-reader";
 import { FileRecord } from "@reactioncommerce/file-collections";
 import { Meteor } from "meteor/meteor";
 import { Random } from "meteor/random";
-import { Products, ProductSearch, Tags, Packages, Orders, OrderSearch, Catalog, MediaRecords } from "/lib/collections";
+import { Products, Tags, Packages, MediaRecords } from "/lib/collections";
 import { Job, Jobs } from "/imports/utils/jobs"
 import { Media } from "/imports/plugins/core/files/server";
 import Logger from "@reactioncommerce/logger";
-import { productTemplate, variantTemplate, optionTemplate, orderTemplate } from "./dataset";
+import { productTemplate, variantTemplate, optionTemplate } from "./sample-data/dataTemplates";
 import collections from "/imports/collections/rawCollections";
 import publishProductToCatalogById from "/imports/node-app/core-services/catalog/utils/publishProductToCatalogById.js";
 import getGraphQLContextInMeteorMethod from "/imports/plugins/core/graphql/server/getGraphQLContextInMeteorMethod";
@@ -26,53 +26,6 @@ const methods = {};
   };
 
   return context;
-}
-
-/**
- * @method resetMedia
- * @summary Reset the media collection
- * @return {undefined}
- */
-function resetMedia() {
-  const images = Promise.await(Media.find());
-  Promise.await(Promise.all(images.map((fileRecord) => Media.remove(fileRecord))));
-}
-
-/**
- * @method loadSmallProducts
- * @summary load products from the "small" dataset
- * @return {undefined}
- */
-function loadSmallProducts() {
-  Logger.info("Starting load Products");
-  turnOffRevisions();
-  const products = require("/imports/plugins/custom/reaction-devtools/sample-data/data/small/Products.json");
-  products.forEach((product) => {
-    product.createdAt = new Date();
-    product.updatedAt = new Date();
-    Products.insert(product, {}, { publish: true });
-    if (product.type === "simple" && product.isVisible) {
-      publishProductToCatalogById(product._id, getContext());
-    }
-  });
-  turnOnRevisions();
-  kickoffProductSearchRebuild();
-  Logger.info("Products loaded");
-}
-
-/**
- * @method loadSmallTags
- * @summary load tags from the "small" dataset
- * @return {undefined}
- */
-function loadSmallTags() {
-  Logger.info("Starting load Tags");
-  const tags = require("/imports/plugins/custom/reaction-devtools/sample-data/data/small/Tags.json");
-  tags.forEach((tag) => {
-    tag.updatedAt = new Date();
-    Tags.insert(tag);
-  });
-  Logger.info("Tags loaded");
 }
 
 /**
@@ -401,27 +354,6 @@ function addProduct() {
 }
 
 /**
- * @method addOrder
- * @summary Add a randomized order from a template
- * @returns {object} order - The order object
- */
-function addOrder() {
-  const order = { ...orderTemplate };
-  order._id = Random.id().toString();
-  order.referenceId = Random.id().toString();
-  order.createdAt = new Date();
-  order.email = faker.internet.email();
-
-  const newName = `${faker.name.firstName()} ${faker.name.lastName()}`;
-
-  order.shipping.forEach((shippingRecord, index) => {
-    order.shipping[index].address.fullName = newName;
-  });
-
-  return order;
-}
-
-/**
  * @method loadDataset
  * @summary load products generated from a template
  * @param {number} [numProducts=1000] The number of products to load
@@ -440,26 +372,6 @@ function loadDataset(numProducts = 1000) {
     Logger.info(`Created ${numProducts} products`);
   }, (error) => {
     Logger.error(error, "Error creating product record");
-  });
-}
-
-/**
- * @method loadOrders
- * @summary Bulk load a number of orders
- * @param {number} [numOrders=10000] The number of orders to load
- */
-function loadOrders(numOrders = 10000) {
-  const rawOrders = Orders.rawCollection();
-  const orders = [];
-  for (let x = 0; x < numOrders; x += 1) {
-    const newOrder = addOrder();
-    orders.push(newOrder);
-  }
-  const writeOrderOperations = orders.map((order) => ({ insertOne: order }));
-  rawOrders.bulkWrite(writeOrderOperations).then(() => {
-    Logger.info(`Created ${numOrders} orders`);
-  }, (error) => {
-    Logger.error(error, "Error creating order records");
   });
 }
 
@@ -570,40 +482,6 @@ function kickoffOrderSearchRebuild() {
       cancelRepeats: true
     });
 }
-/**
- * @method resetData
- * @summary Clear out data, bypassing revision control when necessary
- * @returns {undefined}
- */
-methods.resetData = function () {
-  // delete existing data
-  Tags.remove({});
-  Products.remove({});
-  Catalog.remove({});
-  ProductSearch.remove({});
-  OrderSearch.remove({});
-  Orders.remove({});
-  resetMedia();
-};
-
-/**
- * @method loadSmallDataset
- * @summary Load the "small" dataset
- * @returns {undefined}
- */
-methods.loadSmallDataset = function () {
-  loadSmallTags();
-  loadSmallProducts();
-};
-
-/**
- * @method loadSmallOrders
- * @summary Load 100 orders for the "small" dataset
- * @returns {undefined}
- */
-methods.loadSmallOrders = function () {
-  loadOrders(100);
-};
 
 /**
  * @method loadImages
@@ -636,15 +514,6 @@ methods.loadMediumDataset = function () {
 };
 
 /**
- * @method loadMediumOrders
- * @summary Load 10000 orders for the "medium" dataset
- * @returns {undefined}
- */
-methods.loadMediumOrders = function () {
-  loadOrders(10000);
-};
-
-/**
  * @method loadLargeDataset
  * @summary Load the "large" dataset of products and tags
  * @returns {undefined}
@@ -657,25 +526,10 @@ methods.loadLargeDataset = function () {
   kickoffProductSearchRebuild();
 };
 
-/**
- * @method loadLargeOrders
- * @summary Load 50k orders for the "large" dataset
- * @returns {undefined}
- */
-methods.loadLargeOrders = () => {
-  loadOrders(50000);
-};
-
-
 export default methods;
 
 Meteor.methods({
-  "devtools/loaddata/small/products": methods.loadSmallDataset,
-  "devtools/loaddata/small/orders": methods.loadSmallOrders,
   "devtools/loaddata/images": methods.loadImages,
   "devtools/loaddata/medium/products": methods.loadMediumDataset,
-  "devtools/loaddata/medium/orders": methods.loadMediumOrders,
-  "devtools/loaddata/large/products": methods.loadLargeDataset,
-  "devtools/loaddata/large/orders": methods.loadLargeOrders,
-  "devtools/resetData": methods.resetData
+  "devtools/loaddata/large/products": methods.loadLargeDataset
 });

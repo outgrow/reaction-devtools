@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Meteor } from "meteor/meteor";
 import { Button, SettingsCard } from "@reactioncommerce/reaction-ui";
+import loadOrders from "../mutations/loadOrders";
 import loadProductsAndTags from "../mutations/loadProductsAndTags";
 import resetDevtoolData from "../mutations/resetDevtoolData";
 
@@ -67,14 +68,23 @@ class DevTools extends Component {
     }
   }
 
-  handleSmallOrdersClick = () => {
-    Meteor.call("devtools/loaddata/small/orders", (error) => {
-      if (error) {
-        Alerts.toast(`Error loading order data ${error.reason}`, "error");
-      } else {
-        Alerts.toast("Orders loaded successfully", "success");
-      }
-    });
+  handleOrderClick = async (desiredOrderCount) => {
+    const { client } = this.props;
+
+    try {
+      await client.mutate({
+        mutation: loadOrders,
+        variables: {
+          input: {
+            desiredOrderCount
+          }
+        }
+      });
+
+      Alerts.toast("Orders loaded successfully", "success");
+    } catch (err) {
+      Alerts.toast(`Error loading order data ${err}`, "error");
+    }
   }
 
   handleMediumDataClick = () => {
@@ -150,7 +160,7 @@ class DevTools extends Component {
             bezelStyle={"solid"}
             primary={true}
             label={"Load Orders"}
-            onClick={this.handleSmallOrdersClick}
+            onClick={() => this.handleOrderClick(100)}
           />
           <br />
           <br />
@@ -189,7 +199,7 @@ class DevTools extends Component {
             bezelStyle={"solid"}
             primary={true}
             label={"Load Orders"}
-            onClick={this.handleMediumOrdersClick}
+            onClick={() => this.handleOrderClick(10000)}
           />
           <br />
           <br />
@@ -219,7 +229,7 @@ class DevTools extends Component {
             bezelStyle={"solid"}
             primary={true}
             label={"Load Orders"}
-            onClick={this.handleLargeOrdersClick}
+            onClick={() => this.handleOrderClick(50000)}
           />
           <br />
           <br />
