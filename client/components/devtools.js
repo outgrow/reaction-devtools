@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Meteor } from "meteor/meteor";
 import { Button, SettingsCard } from "@reactioncommerce/reaction-ui";
 import loadOrders from "../mutations/loadOrders";
+import loadProductImages from "../mutations/loadProductImages";
 import loadProductsAndTags from "../mutations/loadProductsAndTags";
 import resetDevtoolData from "../mutations/resetDevtoolData";
 
@@ -43,14 +44,23 @@ class DevTools extends Component {
     });
   }
 
-  handleImagesFromWebClick = () => {
-    Meteor.call("devtools/loaddata/images", "web", (error) => {
-      if (error) {
-        Alerts.toast(`Error loading images ${error.reason}`, "error");
-      } else {
-        Alerts.toast("Images loaded successfully", "success");
-      }
-    });
+  handleImagesFromWebClick = async () => {
+    const { client } = this.props;
+
+    try {
+      await client.mutate({
+        mutation: loadProductImages,
+        variables: {
+          input: {
+            source: "web"
+          }
+        }
+      });
+
+      Alerts.toast("Images loaded successfully", "success");
+    } catch (err) {
+      Alerts.toast(`Error loading images ${err}`, "error");
+    }
   }
 
   handleLoadProductsAndTags = async (size) => {

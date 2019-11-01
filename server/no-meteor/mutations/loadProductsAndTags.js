@@ -9,11 +9,17 @@ import { optionTemplate, productTemplate, variantTemplate } from "../../sample-d
 /**
  * @method assignHashtagsToProducts
  * @summary Assign generated hashtags to products so every tags has at least 100 products
- * @param {object} productCollection - The Products MongoDB collection
  * @param {array} tags - An array of tags to assign
+ * @param {object} context - The application context
  */
-async function assignHashtagsToProducts(productCollection, tags) {
-  const products = await productCollection.find({ type: "simple" }).toArray();
+async function assignHashtagsToProducts(tags, context) {
+  const {
+    collections: {
+      Products
+    }
+  } = context;
+
+  const products = await Products.find({ type: "simple" }).toArray();
 
   const tagIds = tags.reduce((tagArray, tag) => {
     if (!tag.isTopLevel) {
@@ -35,7 +41,7 @@ async function assignHashtagsToProducts(productCollection, tags) {
     }
   });
 
-  await productCollection.bulkWrite(writeOperations);
+  await Products.bulkWrite(writeOperations);
 
   return;
 }
@@ -174,7 +180,7 @@ export default async function loadProductsAndTags(context, input) {
   try {
     await Products.bulkWrite(writeOperations);
 
-    await assignHashtagsToProducts(Products, tags);
+    await assignHashtagsToProducts(tags, context);
 
     await publishProductsToCatalog(productIds, context);
 

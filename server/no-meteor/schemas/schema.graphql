@@ -55,6 +55,9 @@ input LoadOrdersInput {
 input LoadProductImagesInput {
   "An optional string identifying the mutation call, which will be returned in the response payload"
   clientMutationId: String
+
+  "Where to get the images from"
+  source: String!
 }
 
 input ResetDataInput {

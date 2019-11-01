@@ -2,17 +2,12 @@ import { Buffer } from "buffer";
 import randomPuppy from "random-puppy";
 import fetch from "node-fetch";
 import jpeg from "jpeg-js";
-import faker from "faker";
-import { slugify } from "transliteration";
 import bufferStreamReader from "buffer-stream-reader";
 import { FileRecord } from "@reactioncommerce/file-collections";
 import { Meteor } from "meteor/meteor";
-import { Random } from "meteor/random";
-import { Products, Tags, Packages, MediaRecords } from "/lib/collections";
-import { Job, Jobs } from "/imports/utils/jobs"
+import { Products, MediaRecords } from "/lib/collections";
 import { Media } from "/imports/plugins/core/files/server";
 import Logger from "@reactioncommerce/logger";
-import { productTemplate, variantTemplate, optionTemplate } from "./sample-data/dataTemplates";
 import collections from "/imports/collections/rawCollections";
 import publishProductToCatalogById from "/imports/node-app/core-services/catalog/utils/publishProductToCatalogById.js";
 import getGraphQLContextInMeteorMethod from "/imports/plugins/core/graphql/server/getGraphQLContextInMeteorMethod";
@@ -284,136 +279,6 @@ function attachProductImages(from = "random") {
 }
 
 /**
- * @method loadDataset
- * @summary load products generated from a template
- * @param {number} [numProducts=1000] The number of products to load
- */
-function loadDataset(numProducts = 1000) {
-  methods.resetData();
-  Logger.info("Loading Medium Dataset");
-  const rawProducts = Products.rawCollection();
-  const products = [];
-  for (let x = 0; x < numProducts; x += 1) {
-    const newProducts = addProduct();
-    products.push(...newProducts);
-  }
-  const writeOperations = products.map((product) => ({ insertOne: product }));
-  rawProducts.bulkWrite(writeOperations).then(() => {
-    Logger.info(`Created ${numProducts} products`);
-  }, (error) => {
-    Logger.error(error, "Error creating product record");
-  });
-}
-
-/**
- * @method loadMediumTags
- * @summary Load tags from a datafile for the "medium" dataset
- * @returns {array} tags - An array of tags loaded from the data file
- */
-function loadMediumTags() {
-  const tags = require("/imports/plugins/custom/reaction-devtools/sample-data/data/medium/Tags.json");
-  tags.forEach((tag) => {
-    tag.updatedAt = new Date();
-    Tags.insert(tag);
-  });
-  Logger.info("Tags loaded");
-  return tags;
-}
-
-/**
- * @method turnOffRevisions
- * @summary temporarily turn off revisions so we can just insert data willy-nilly
- * @returns {undefined}
- */
-function turnOffRevisions() {
-  Packages.update({
-    name: "reaction-revisions"
-  }, {
-    $set: {
-      "settings.general.enabled": false
-    }
-  });
-}
-/**
- * @method turnOnRevisions
- * @summary Turn revisions back on to the system functions normally
- * @returns {undefined}
- */
-function turnOnRevisions() {
-  Packages.update({
-    name: "reaction-revisions"
-  }, {
-    $set: {
-      "settings.general.enabled": true
-    }
-  });
-}
-
-/**
- * @method assignHashtagsToProducts
- * @summary Assign generated hashtags to products so every tags has at least 100 products
- * @param {array} tags - An array of tags to assign
- * @param {number} [productPerCategory=100] How many products per category
- */
-function assignHashtagsToProducts(tags, productPerCategory = 100) {
-  const products = Products.find({ type: "simple" }, { _id: 1 }).fetch();
-  const tagIds = tags.reduce((tagArray, tag) => {
-    if (!tag.isTopLevel) {
-      tagArray.push(tag._id);
-    }
-    return tagArray;
-  }, []);
-  const rawProducts = Products.rawCollection();
-  const writeOperations = [];
-  tagIds.forEach((tagId) => {
-    for (let x = 0; x < productPerCategory; x += 1) {
-      const product = Random.choice(products);
-      const filter = { _id: product._id };
-      const update = { $addToSet: { hashtags: tagId } };
-      writeOperations.push({ updateOne: { filter, update } });
-    }
-  });
-  rawProducts.bulkWrite(writeOperations);
-  Logger.info("Tags assigned");
-}
-
-/**
- * @method kickoffProductSearchRebuild
- * @summary Drop a job to rebuild the product search into the queue
- * @returns {undefined}
- */
-function kickoffProductSearchRebuild() {
-  new Job(Jobs, "product/buildSearchCollection", {})
-    .priority("normal")
-    .retry({
-      retries: 5,
-      wait: 60000,
-      backoff: "exponential"
-    })
-    .save({
-      cancelRepeats: true
-    });
-}
-
-/**
- * @method kickoffOrderSearchRebuild
- * @summary Drop a job to rebuilt the order search into the queue
- * @returns {undefined}
- */
-function kickoffOrderSearchRebuild() {
-  new Job(Jobs, "order/buildSearchCollection", {})
-    .priority("normal")
-    .retry({
-      retries: 5,
-      wait: 60000,
-      backoff: "exponential"
-    })
-    .save({
-      cancelRepeats: true
-    });
-}
-
-/**
  * @method loadImages
  * @summary Generate random images and attach them to all products
  * @returns {undefined}
@@ -423,43 +288,8 @@ methods.loadImages = function (from = "random") {
   attachProductImages(from);
 };
 
-/**
- * @method loadMediumDataset
- * @summary Load the "medium" dataset of products and tags
- * @returns {undefined}
- */
-methods.loadMediumDataset = function () {
-  turnOffRevisions();
-  methods.resetData();
-  loadDataset(1000, 10000);
-  const tags = loadMediumTags();
-  assignHashtagsToProducts(tags);
-  // importProductImages();
-  // try to use this to make reactivity work
-  // Products.update({}, { $set: { visible: true } }, { multi: true }, { selector: { type: "simple" }, publish: true });
-  turnOnRevisions();
-  kickoffProductSearchRebuild();
-  kickoffOrderSearchRebuild();
-  Logger.info("Loading Medium Dataset complete");
-};
-
-/**
- * @method loadLargeDataset
- * @summary Load the "large" dataset of products and tags
- * @returns {undefined}
- */
-methods.loadLargeDataset = function () {
-  turnOffRevisions();
-  methods.resetData();
-  loadDataset(50000);
-  turnOnRevisions();
-  kickoffProductSearchRebuild();
-};
-
 export default methods;
 
 Meteor.methods({
-  "devtools/loaddata/images": methods.loadImages,
-  "devtools/loaddata/medium/products": methods.loadMediumDataset,
-  "devtools/loaddata/large/products": methods.loadLargeDataset
+  "devtools/loaddata/images": methods.loadImages
 });
